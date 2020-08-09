@@ -18,12 +18,23 @@ usersSchema.plugin(idValidator);
 usersSchema.index({ email: 1 }, { unique: true });
 usersSchema.index({ mobile: 1 }, { sparse: true, unique: true });
 
+
+//find all parent users
+usersSchema.statics.findUserList = function findUserList () {
+
+  return new Promise((resolve, reject) => {
+    this.find({type: 'PARENT'})
+      .then((response) => {
+        return resolve(response);
+      })
+      .catch((err) => {
+        return reject(err);
+      });
+  });
+};
+
 //find a user
 usersSchema.statics.findUser = function findUser (query) {
-  
-  // let query = {
-  //   '$or':[{email: identifier}, {_id: identifier}]
-  // };
 
   return new Promise((resolve, reject) => {
     this.findOne(query)

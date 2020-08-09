@@ -76,13 +76,52 @@ studentSchema.statics.deleteStudent = function deleteStudent (studentId) {
 //find all students
 studentSchema.statics.findStudentList = function findStudentList () {
   return new Promise((resolve, reject) => {
-    this.find({})
-      .then((response) => {
-        return resolve(response);
-      })
-      .catch((err) => {
-        return reject(err);
-      });
+
+    this.aggregate([
+      {
+        '$match': {}
+      }, {
+        '$lookup': {
+          'from': 'class',
+          'localField': 'classId',
+          'foreignField': '_id',
+          'as': 'classDetails'
+        }
+      }, {
+        '$unwind': {
+          'path': '$classDetails',
+          'preserveNullAndEmptyArrays': true
+        }
+      }, {
+        '$lookup': {
+          'from': 'users',
+          'localField': 'parentId',
+          'foreignField': '_id',
+          'as': 'parentDetails'
+        }
+      }, {
+        '$unwind': {
+          'path': '$parentDetails',
+          'preserveNullAndEmptyArrays': true
+        }
+      }, {
+        '$project': {
+          _id: 1.0,
+          parentId: 1.0,
+          classId: 1.0,
+          name: 1.0,
+          DOB: 1.0,
+          year: 1.0,
+          fee: 1.0,
+          isPaidFee: 1.0,
+          classDetails: 1.0,
+          parentDetails: 1.0
+        }
+      }
+    ]).allowDiskUse(true).exec(function (err, studentDetails) {
+      if (err) reject(err);
+      resolve(studentDetails);
+    });
   });
 };
 

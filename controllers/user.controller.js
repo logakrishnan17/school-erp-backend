@@ -54,6 +54,32 @@ const loginHandler = async(req, res) => {
     });
 };
 
+const getUserListHandler = async(req, res) => {
+  let accessToken = req.headers['authorization'];
+
+  try {
+
+    if(!allowedUserTypes.includes(req.auth.data.type)) {
+      return res.status(400).send(responseFormat.errorMessage('unauthorized access!...'));
+    }
+
+    Users.findUserList()
+    .then(async usersDetails => {
+
+      return res.status(200).send(responseFormat.successMessage(
+        'Users list is retrieved successfully',
+        usersDetails,
+        accessToken
+      ));
+    })
+    .catch((e) => {
+      return res.status(400).send(responseFormat.errorMessage(e.message));
+    });
+  } catch (e) {
+    res.status(400).send(responseFormat.errorMessage(e.message));
+  }
+};
+
 const getUserHandler = async(req, res) => {
   let accessToken = req.headers['authorization'];
   const userId = req.params.userId;
@@ -214,6 +240,7 @@ const paymentHandler = async(req, res) => {
 };
 module.exports = {
   loginHandler,
+  getUserListHandler,
   getUserHandler,
   createUserHandler,
   updateUserHandler,

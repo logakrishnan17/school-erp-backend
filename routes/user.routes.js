@@ -16,9 +16,9 @@ router.post('/', auth, async (req, res) => {
 });
 
 // // Get user list
-// router.get('/', auth, async (req, res) => {
-//   userHandler.getUserListHandler(req, res);
-// });
+router.get('/', auth, async (req, res) => {
+  userHandler.getUserListHandler(req, res);
+});
 
 // Get user
 router.get('/:userId', auth, async (req, res) => {
